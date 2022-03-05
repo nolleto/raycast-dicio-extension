@@ -1,10 +1,11 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "dicio",
+  "name": "raycast-dicio-extension",
   "title": "Dicio",
-  "description": "Integrates with dicio.com.br",
+  "description": "Raycast extension that integrate dicio",
   "icon": "command-icon.png",
   "author": "nolleto",
+  "repository": "https://github.com/nolleto/raycast-dicio-extension",
   "license": "MIT",
   "commands": [
     {
