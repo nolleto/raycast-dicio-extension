@@ -1,0 +1,9 @@
+{
+  "name": "raycast-dicio-extension",
+  "version": "1.0.0",
+  "description": "Raycast extension that integrate dicio",
+  "main": "index.js",
+  "repository": "https://github.com/nolleto/raycast-dicio-extension",
+  "author": "Felipe Nolleto Nascimento",
+  "license": "MIT"
+}
