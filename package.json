@@ -10,13 +10,14 @@
   "commands": [
     {
       "name": "index",
-      "title": "Hello World",
+      "title": "Dicio",
       "description": "Template with a plain detail view",
       "mode": "view"
     }
   ],
   "dependencies": {
-    "@raycast/api": "^1.29.1"
+    "@raycast/api": "^1.29.1",
+    "node-fetch": "^3.2.1"
   },
   "devDependencies": {
     "@types/node": "~16.10.0",
