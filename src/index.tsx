@@ -20,6 +20,9 @@ export default function main() {
     onError: (word, error) => {
       searchingToast.hide()
       errorToast.show({ title: error })
+    },
+    onCancel: () => {
+      searchingToast.hide()
     }
   });
 

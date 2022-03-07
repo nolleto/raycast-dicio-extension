@@ -1,10 +1,11 @@
-import dicioApi from "../services/dicioApi";
-import { useState } from "react";
+import dicioApi, { AbortRequestError, ApiResponse } from "../services/dicioApi";
+import { useRef, useState } from "react";
 
 type useDicioSearchWordsProps = {
   onPending: (word: string) => void;
   onFulfilled: (word: string, dicioWords: DicioWord[]) => void;
   onError: (word: string, error: string) => void;
+  onCancel: () => void;
 }
 
 type useDicioSearchWordsResult = {
@@ -16,17 +17,34 @@ export default function useDicioSearchWords({
   onPending,
   onFulfilled,
   onError,
+  onCancel,
 }: useDicioSearchWordsProps): useDicioSearchWordsResult {
   const [isLoading, setIsLoading] = useState(false);
+  const searchRequest = useRef<ApiResponse<DicioWord[]>>()
 
-  const search = async (word: string) => {
-    if (!word.trim()) return;
-
+  const setLoadingState = (word: string) => {
     onPending(word)
     setIsLoading(true)
+  }
+
+  const cancelSearch = () => {
+    if (searchRequest.current) {
+      searchRequest.current.cancel()
+      searchRequest.current = undefined
+      onCancel()
+    }
+  }
+
+  const search = async (word: string) => {
+    cancelSearch()
+
+    if (!word.trim()) return;
+
+    setLoadingState(word)
 
     try {
-      const dicioWords = await dicioApi.allMeanings(word);
+      searchRequest.current = dicioApi.allMeanings(word);
+      const dicioWords = await searchRequest.current
       const hasResults = Boolean(dicioWords.length)
 
       if (hasResults) {
@@ -36,7 +54,9 @@ export default function useDicioSearchWords({
       }
 
     } catch (error) {
-      if (error instanceof Error) {
+      if (error instanceof AbortRequestError) {
+        // does nothing
+      } else if (error instanceof Error) {
         onError(word, error.message);
       } else {
         onError(word, 'Unknown error');
