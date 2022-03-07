@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+import dicioApi from "../services/dicioApi";
 import { useState } from "react";
 
 type useDicioSearchWordsProps = {
@@ -19,29 +19,31 @@ export default function useDicioSearchWords({
 }: useDicioSearchWordsProps): useDicioSearchWordsResult {
   const [isLoading, setIsLoading] = useState(false);
 
-  const search = (word: string) => {
+  const search = async (word: string) => {
     if (!word.trim()) return;
 
     onPending(word)
     setIsLoading(true)
 
-    fetch(`https://significado.herokuapp.com/allMeanings/${word}`)
-      .then(response => response.json() as Promise<DicioSearchWordsResponse>)
-      .then((data) => {
-        const hasResults = Boolean(data.length)
+    try {
+      const dicioWords = await dicioApi.allMeanings(word);
+      const hasResults = Boolean(dicioWords.length)
 
-        if (hasResults) {
-          onFulfilled(word, data)
-        } else {
-          throw new Error(`Nenhum resultado para a palavra "${word}"`)
-        }
-      })
-      .catch((error) => {
-        onError(word, error.message)
-      })
-      .finally(() => {
-        setIsLoading(false)
-      })
+      if (hasResults) {
+        onFulfilled(word, dicioWords)
+      } else {
+        throw new Error(`Nenhum resultado para a palavra "${word}"`)
+      }
+
+    } catch (error) {
+      if (error instanceof Error) {
+        onError(word, error.message);
+      } else {
+        onError(word, 'Unknown error');
+      }
+    }
+
+    setIsLoading(false);
   };
 
   return {

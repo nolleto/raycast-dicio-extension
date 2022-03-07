@@ -1,32 +1,25 @@
-import { Toast, showToast, useNavigation } from "@raycast/api";
+import useToast, { Toast } from './hooks/useToast';
 
 import WordDetails from "./components/WordDetails";
 import WordSearch from "./components/WordSearch";
-import useDicioSearchWords from "./hooks/useDicioSearchWords";
-import { useRef } from "react";
+import useDicioSearchWordMeanings from "./hooks/useDicioSearchWordMeanings";
+import { useNavigation } from "@raycast/api";
 
 export default function main() {
   const { push } = useNavigation();
-  const searchingWordToast = useRef<Toast>()
-  const { isLoading, search } = useDicioSearchWords({
+  const searchingToast = useToast({ style: Toast.Style.Animated, })
+  const errorToast = useToast({ style: Toast.Style.Failure, })
+  const { isLoading, search } = useDicioSearchWordMeanings({
     onPending: (word) => {
-      showToast({
-        title: `Buscando significado da palavra "${word}"`,
-        style: Toast.Style.Animated,
-      }).then(toast => {
-        searchingWordToast.current = toast;
-      })
+      searchingToast.show({ title: `Buscando significado da palavra "${word}"` })
     },
     onFulfilled: (word, dicioWords) => {
-      searchingWordToast.current?.hide()
+      searchingToast.hide()
       push(<WordDetails word={word} dicioWords={dicioWords} />)
     },
     onError: (word, error) => {
-      searchingWordToast.current?.hide()
-      showToast({
-        title: error,
-        style: Toast.Style.Failure
-      })
+      searchingToast.hide()
+      errorToast.show({ title: error })
     }
   });
 
